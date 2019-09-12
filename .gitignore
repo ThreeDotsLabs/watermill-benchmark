@@ -10,3 +10,12 @@
 
 # Output of the go coverage tool, specifically when used with LiteIDE
 *.out
+
+.mod-cache
+.terraform
+*.tfstate*
+compose/.env
+compose/*.json
+
+.idea
+vendor

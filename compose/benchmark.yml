@@ -1,0 +1,9 @@
+version: '3'
+services:
+  benchmark:
+    image: golang:1.12
+    command: /bin/true
+    volumes:
+      - $GOPATH/pkg/mod/cache:/go/pkg/mod/cache
+    env_file:
+      - .env
