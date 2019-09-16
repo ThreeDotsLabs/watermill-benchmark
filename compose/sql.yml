@@ -3,6 +3,7 @@ services:
   mysql:
     image: mysql:8.0
     restart: unless-stopped
+    command: --max-connections 2048
     ports:
       - 3306:3306
     environment:

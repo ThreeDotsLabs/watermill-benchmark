@@ -1,17 +1,21 @@
 package pkg
 
 import (
+	stdSQL "database/sql"
 	"fmt"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/Shopify/sarama"
+	driver "github.com/go-sql-driver/mysql"
 	"github.com/nats-io/stan.go"
 
 	"github.com/ThreeDotsLabs/watermill"
 	"github.com/ThreeDotsLabs/watermill-googlecloud/pkg/googlecloud"
-	"github.com/ThreeDotsLabs/watermill-kafka/pkg/kafka"
+	"github.com/ThreeDotsLabs/watermill-kafka/v2/pkg/kafka"
 	"github.com/ThreeDotsLabs/watermill-nats/pkg/nats"
+	"github.com/ThreeDotsLabs/watermill-sql/pkg/sql"
 	"github.com/ThreeDotsLabs/watermill/message"
 	"github.com/ThreeDotsLabs/watermill/pubsub/gochannel"
 )
@@ -74,9 +78,10 @@ var pubSubDefinitions = map[string]PubSubDefinition{
 			}
 
 			publisher, err := kafka.NewPublisher(
-				[]string{broker},
-				kafka.DefaultMarshaler{},
-				nil,
+				kafka.PublisherConfig{
+					Brokers:   []string{broker},
+					Marshaler: kafka.DefaultMarshaler{},
+				},
 				logger,
 			)
 			if err != nil {
@@ -88,11 +93,11 @@ var pubSubDefinitions = map[string]PubSubDefinition{
 
 			subscriber, err := kafka.NewSubscriber(
 				kafka.SubscriberConfig{
-					Brokers:       []string{broker},
-					ConsumerGroup: "benchmark",
+					Brokers:               []string{broker},
+					Unmarshaler:           kafka.DefaultMarshaler{},
+					OverwriteSaramaConfig: saramaConfig,
+					ConsumerGroup:         "benchmark",
 				},
-				saramaConfig,
-				kafka.DefaultMarshaler{},
 				logger,
 			)
 			if err != nil {
@@ -176,4 +181,67 @@ var pubSubDefinitions = map[string]PubSubDefinition{
 			return pub, sub
 		},
 	},
+	"sql": {
+		Constructor: func() (message.Publisher, message.Subscriber) {
+			conf := driver.NewConfig()
+			conf.Net = "tcp"
+			conf.User = "root"
+			conf.Addr = "mysql"
+			conf.DBName = "watermill"
+
+			db, err := stdSQL.Open("mysql", conf.FormatDSN())
+			if err != nil {
+				panic(err)
+			}
+
+			err = db.Ping()
+			if err != nil {
+				panic(err)
+			}
+
+			pub, err := sql.NewPublisher(
+				db,
+				sql.PublisherConfig{
+					AutoInitializeSchema: true,
+					SchemaAdapter:        MySQLSchema{},
+				},
+				logger,
+			)
+			if err != nil {
+				panic(err)
+			}
+
+			sub, err := sql.NewSubscriber(
+				db,
+				sql.SubscriberConfig{
+					SchemaAdapter:  MySQLSchema{},
+					OffsetsAdapter: sql.DefaultMySQLOffsetsAdapter{},
+				},
+				logger,
+			)
+			if err != nil {
+				panic(err)
+			}
+
+			return pub, sub
+		},
+	},
+}
+
+type MySQLSchema struct {
+	sql.DefaultSchema
+}
+
+func (m MySQLSchema) SchemaInitializingQueries(topic string) []string {
+	createMessagesTable := strings.Join([]string{
+		"CREATE TABLE IF NOT EXISTS " + m.MessagesTable(topic) + " (",
+		"`offset` BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,",
+		"`uuid` BINARY(26) NOT NULL,",
+		"`created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,",
+		"`payload` BLOB DEFAULT NULL,",
+		"`metadata` JSON DEFAULT NULL",
+		");",
+	}, "\n")
+
+	return []string{createMessagesTable}
 }
