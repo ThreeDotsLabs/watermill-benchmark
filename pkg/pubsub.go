@@ -214,8 +214,10 @@ var pubSubDefinitions = map[string]PubSubDefinition{
 			sub, err := sql.NewSubscriber(
 				db,
 				sql.SubscriberConfig{
-					SchemaAdapter:  MySQLSchema{},
-					OffsetsAdapter: sql.DefaultMySQLOffsetsAdapter{},
+					SchemaAdapter:    MySQLSchema{},
+					OffsetsAdapter:   sql.DefaultMySQLOffsetsAdapter{},
+					ConsumerGroup:    watermill.NewULID(),
+					InitializeSchema: true,
 				},
 				logger,
 			)
