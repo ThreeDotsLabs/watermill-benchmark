@@ -22,13 +22,13 @@ type PubSub struct {
 	Publisher  message.Publisher
 	Subscriber message.Subscriber
 
-	MessagesCount uint64
-	MessageSize   uint64
+	MessagesCount int
+	MessageSize   int
 
 	Topic string
 }
 
-func NewPubSub(name string, topic string, messagesCount uint64, messageSize uint64) (PubSub, error) {
+func NewPubSub(name string, topic string, messagesCount int, messageSize int) (PubSub, error) {
 	definition, ok := pubSubDefinitions[name]
 	if !ok {
 		return PubSub{}, fmt.Errorf("unknown PubSub: %s", name)

@@ -10,14 +10,14 @@ import (
 )
 
 type Results struct {
-	Count          uint64
-	MessageSize    uint64
+	Count          int
+	MessageSize    int
 	MeanRate       float64
 	MeanThroughput float64
 }
 
 // RunBenchmark runs benchmark on chosen pubsub and returns publishing and subscribing results.
-func RunBenchmark(pubSubName string, messagesCount uint64, messageSize uint64) (Results, Results, error) {
+func RunBenchmark(pubSubName string, messagesCount int, messageSize int) (Results, Results, error) {
 	topic := "benchmark_" + watermill.NewShortUUID()
 
 	if err := initialise(pubSubName, topic); err != nil {
@@ -52,7 +52,7 @@ func RunBenchmark(pubSubName string, messagesCount uint64, messageSize uint64) (
 	}()
 
 	wg := sync.WaitGroup{}
-	wg.Add(int(pubsub.MessagesCount))
+	wg.Add(pubsub.MessagesCount)
 
 	c = NewCounter()
 
@@ -77,7 +77,7 @@ func RunBenchmark(pubSubName string, messagesCount uint64, messageSize uint64) (
 	}
 
 	subResults := Results{
-		Count:          c.Count(),
+		Count:          int(c.Count()),
 		MessageSize:    pubsub.MessageSize,
 		MeanRate:       c.MeanPerSecond(),
 		MeanThroughput: c.MeanPerSecond() * float64(pubsub.MessageSize),

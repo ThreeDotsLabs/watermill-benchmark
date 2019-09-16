@@ -12,32 +12,23 @@ import (
 )
 
 func (ps PubSub) PublishMessages() error {
+	rand.Seed(time.Now().UnixNano())
+
 	messagesLeft := ps.MessagesCount
 	workers := 200
 
-	addMsg := make(chan struct{})
 	wg := sync.WaitGroup{}
+	wg.Add(workers)
+
+	addMsg := make(chan *message.Message)
 
 	start := time.Now()
-
-	rand.Seed(time.Now().UnixNano())
-
-	msgPayload, err := ps.payload()
-	if err != nil {
-		return err
-	}
-
-	wg.Add(workers)
 
 	for num := 0; num < workers; num++ {
 		go func() {
 			defer wg.Done()
 
-			var msg *message.Message
-
-			for range addMsg {
-				msg = message.NewMessage(watermill.NewULID(), msgPayload)
-
+			for msg := range addMsg {
 				// using function from middleware to set correlation id, useful for debugging
 				middleware.SetCorrelationID(watermill.NewShortUUID(), msg)
 
@@ -48,8 +39,13 @@ func (ps PubSub) PublishMessages() error {
 		}()
 	}
 
+	msgPayload, err := ps.payload()
+	if err != nil {
+		return err
+	}
 	for ; messagesLeft > 0; messagesLeft-- {
-		addMsg <- struct{}{}
+		msg := message.NewMessage(watermill.NewULID(), msgPayload)
+		addMsg <- msg
 	}
 	close(addMsg)
 

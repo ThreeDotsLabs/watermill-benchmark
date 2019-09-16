@@ -16,7 +16,7 @@ const (
 )
 
 var pubsubFlag = flag.String("pubsub", "", "")
-var messagesCount = flag.Uint64("count", defaultMessagesCount, "")
+var messagesCount = flag.Int("count", defaultMessagesCount, "")
 var messageSizes = flag.String("size", defaultMessageSize, "comma-separated list of message sizes")
 
 func main() {
@@ -34,7 +34,7 @@ func main() {
 		fmt.Printf("Starting benchmark for PubSub %s (%d messages, %d bytes each)\n",
 			*pubsubFlag, *messagesCount, s)
 
-		_, subRes, err := pkg.RunBenchmark(*pubsubFlag, *messagesCount, uint64(s))
+		_, subRes, err := pkg.RunBenchmark(*pubsubFlag, *messagesCount, s)
 		if err != nil {
 			log.Fatal(err)
 		}
