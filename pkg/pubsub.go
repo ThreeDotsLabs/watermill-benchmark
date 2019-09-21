@@ -20,6 +20,10 @@ import (
 	"github.com/ThreeDotsLabs/watermill/pubsub/gochannel"
 )
 
+const (
+	defaultMessagesCount = 1000000
+)
+
 var logger = watermill.NopLogger{}
 
 type PubSub struct {
@@ -40,6 +44,14 @@ func NewPubSub(name string, topic string, messagesCount int, messageSize int) (P
 
 	pub, sub := definition.Constructor()
 
+	if messagesCount == 0 {
+		if definition.MessagesCount != 0 {
+			messagesCount = definition.MessagesCount
+		} else {
+			messagesCount = defaultMessagesCount
+		}
+	}
+
 	return PubSub{
 		Publisher:  pub,
 		Subscriber: sub,
@@ -58,7 +70,8 @@ func (ps PubSub) Close() error {
 }
 
 type PubSubDefinition struct {
-	Constructor func() (message.Publisher, message.Subscriber)
+	Constructor   func() (message.Publisher, message.Subscriber)
+	MessagesCount int
 }
 
 var pubSubDefinitions = map[string]PubSubDefinition{
@@ -71,41 +84,10 @@ var pubSubDefinitions = map[string]PubSubDefinition{
 		},
 	},
 	"kafka": {
-		Constructor: func() (message.Publisher, message.Subscriber) {
-			broker := os.Getenv("WATERMILL_KAFKA_BROKER")
-			if broker == "" {
-				broker = "kafka:9092"
-			}
-
-			publisher, err := kafka.NewPublisher(
-				kafka.PublisherConfig{
-					Brokers:   []string{broker},
-					Marshaler: kafka.DefaultMarshaler{},
-				},
-				logger,
-			)
-			if err != nil {
-				panic(err)
-			}
-
-			saramaConfig := kafka.DefaultSaramaSubscriberConfig()
-			saramaConfig.Consumer.Offsets.Initial = sarama.OffsetOldest
-
-			subscriber, err := kafka.NewSubscriber(
-				kafka.SubscriberConfig{
-					Brokers:               []string{broker},
-					Unmarshaler:           kafka.DefaultMarshaler{},
-					OverwriteSaramaConfig: saramaConfig,
-					ConsumerGroup:         "benchmark",
-				},
-				logger,
-			)
-			if err != nil {
-				panic(err)
-			}
-
-			return publisher, subscriber
-		},
+		Constructor: kafkaConstructor([]string{"kafka:9092"}),
+	},
+	"kafka-multinode": {
+		Constructor: kafkaConstructor([]string{"kafka1:9091", "kafka2:9092", "kafka3:9093", "kafka4:9094", "kafka5:9095"}),
 	},
 	"nats": {
 		Constructor: func() (message.Publisher, message.Subscriber) {
@@ -182,6 +164,7 @@ var pubSubDefinitions = map[string]PubSubDefinition{
 		},
 	},
 	"sql": {
+		MessagesCount: 30000,
 		Constructor: func() (message.Publisher, message.Subscriber) {
 			conf := driver.NewConfig()
 			conf.Net = "tcp"
@@ -230,6 +213,39 @@ var pubSubDefinitions = map[string]PubSubDefinition{
 	},
 }
 
+func kafkaConstructor(brokers []string) func() (message.Publisher, message.Subscriber) {
+	return func() (message.Publisher, message.Subscriber) {
+		publisher, err := kafka.NewPublisher(
+			kafka.PublisherConfig{
+				Brokers:   brokers,
+				Marshaler: kafka.DefaultMarshaler{},
+			},
+			logger,
+		)
+		if err != nil {
+			panic(err)
+		}
+
+		saramaConfig := kafka.DefaultSaramaSubscriberConfig()
+		saramaConfig.Consumer.Offsets.Initial = sarama.OffsetOldest
+
+		subscriber, err := kafka.NewSubscriber(
+			kafka.SubscriberConfig{
+				Brokers:               brokers,
+				Unmarshaler:           kafka.DefaultMarshaler{},
+				OverwriteSaramaConfig: saramaConfig,
+				ConsumerGroup:         "benchmark",
+			},
+			logger,
+		)
+		if err != nil {
+			panic(err)
+		}
+
+		return publisher, subscriber
+	}
+}
+
 type MySQLSchema struct {
 	sql.DefaultSchema
 }
@@ -238,7 +254,7 @@ func (m MySQLSchema) SchemaInitializingQueries(topic string) []string {
 	createMessagesTable := strings.Join([]string{
 		"CREATE TABLE IF NOT EXISTS " + m.MessagesTable(topic) + " (",
 		"`offset` BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,",
-		"`uuid` BINARY(26) NOT NULL,",
+		"`uuid` BINARY(16) NOT NULL,",
 		"`created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,",
 		"`payload` BLOB DEFAULT NULL,",
 		"`metadata` JSON DEFAULT NULL",

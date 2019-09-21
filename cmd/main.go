@@ -11,12 +11,11 @@ import (
 )
 
 const (
-	defaultMessagesCount = 1000000
 	defaultMessageSize   = "256,512,1024"
 )
 
 var pubsubFlag = flag.String("pubsub", "", "")
-var messagesCount = flag.Int("count", defaultMessagesCount, "")
+var messagesCount = flag.Int("count", 0, "")
 var messageSizes = flag.String("size", defaultMessageSize, "comma-separated list of message sizes")
 
 func main() {

@@ -1,16 +1,16 @@
 #!/bin/bash
 set -e
 
-readonly pubsub="$1"
+readonly compose="$1"
 
-if [ -z "$pubsub" ]; then
-    echo "Usage: $0 <pubsub>"
+if [ -z "$compose" ]; then
+    echo "Usage: $0 <compose_name>"
     exit 1
 fi
 
 compose_flags=
-if [ -f "./compose/$pubsub.yml" ]; then
-    compose_flags="-f ./compose/$pubsub.yml"
+if [ -f "./compose/$compose.yml" ]; then
+    compose_flags="-f ./compose/$compose.yml"
     docker-compose $compose_flags up -d --remove-orphans
 
     # TODO replace with waiting for port
@@ -27,4 +27,4 @@ fi
 docker-compose $compose_flags -f ./compose/benchmark.yml run \
     -v "$(pwd):/benchmark" \
     -w /benchmark \
-    benchmark go run -mod=vendor ./cmd/main.go -pubsub "$pubsub"
+    benchmark go run -mod=vendor ./cmd/main.go -pubsub "$compose"

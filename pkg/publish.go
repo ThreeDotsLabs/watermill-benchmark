@@ -1,10 +1,13 @@
 package pkg
 
 import (
+	cryptoRand "crypto/rand"
 	"fmt"
 	"math/rand"
 	"sync"
 	"time"
+
+	"github.com/oklog/ulid"
 
 	"github.com/ThreeDotsLabs/watermill"
 	"github.com/ThreeDotsLabs/watermill/message"
@@ -44,7 +47,7 @@ func (ps PubSub) PublishMessages() error {
 		return err
 	}
 	for ; messagesLeft > 0; messagesLeft-- {
-		msg := message.NewMessage(watermill.NewULID(), msgPayload)
+		msg := message.NewMessage(newBinaryULID(), msgPayload)
 		addMsg <- msg
 	}
 	close(addMsg)
@@ -55,6 +58,14 @@ func (ps PubSub) PublishMessages() error {
 	fmt.Printf("added %d messages in %s, %f msg/s\n", ps.MessagesCount, elapsed, float64(ps.MessagesCount)/elapsed.Seconds())
 
 	return nil
+}
+
+func newBinaryULID() string {
+	bytes, err := ulid.MustNew(ulid.Now(), cryptoRand.Reader).MarshalBinary()
+	if err != nil {
+		panic(err)
+	}
+	return string(bytes)
 }
 
 func (ps PubSub) payload() ([]byte, error) {
