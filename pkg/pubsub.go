@@ -84,10 +84,12 @@ var pubSubDefinitions = map[string]PubSubDefinition{
 		},
 	},
 	"kafka": {
-		Constructor: kafkaConstructor([]string{"kafka:9092"}),
+		MessagesCount: 20000000,
+		Constructor:   kafkaConstructor([]string{"kafka:9092"}),
 	},
 	"kafka-multinode": {
-		Constructor: kafkaConstructor([]string{"kafka1:9091", "kafka2:9092", "kafka3:9093", "kafka4:9094", "kafka5:9095"}),
+		MessagesCount: 20000000,
+		Constructor:   kafkaConstructor([]string{"kafka1:9091", "kafka2:9092", "kafka3:9093", "kafka4:9094", "kafka5:9095"}),
 	},
 	"nats": {
 		Constructor: func() (message.Publisher, message.Subscriber) {

@@ -16,6 +16,8 @@ resource "google_compute_instance" "default" {
 
   boot_disk {
     initialize_params {
+      size  = 128
+      type = "pd-ssd"
       image = "${data.google_compute_image.ubuntu_18.self_link}"
     }
   }

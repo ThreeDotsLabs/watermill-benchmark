@@ -65,6 +65,8 @@ func RunBenchmark(pubSubName string, messagesCount int, messageSize int) (Result
 
 	wg.Wait()
 
+	mean := c.MeanPerSecond()
+
 	doneChannel <- struct{}{}
 
 	if err := pubsub.Close(); err != nil {
@@ -79,8 +81,8 @@ func RunBenchmark(pubSubName string, messagesCount int, messageSize int) (Result
 	subResults := Results{
 		Count:          int(c.Count()),
 		MessageSize:    pubsub.MessageSize,
-		MeanRate:       c.MeanPerSecond(),
-		MeanThroughput: c.MeanPerSecond() * float64(pubsub.MessageSize),
+		MeanRate:       mean,
+		MeanThroughput: mean * float64(pubsub.MessageSize),
 	}
 
 	return pubResults, subResults, nil
