@@ -12,5 +12,6 @@ require (
 	github.com/go-sql-driver/mysql v1.4.1
 	github.com/hashicorp/go-multierror v1.0.0
 	github.com/nats-io/stan.go v0.5.0
+	github.com/oklog/ulid v1.3.1
 	github.com/pkg/errors v0.8.1
 )

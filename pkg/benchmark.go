@@ -29,6 +29,10 @@ func RunBenchmark(pubSubName string, messagesCount int, messageSize int) (Result
 		return Results{}, Results{}, err
 	}
 
+	if pubsub.Details != "" {
+		fmt.Println("Pub/Sub details:", pubsub.Details)
+	}
+
 	if err := pubsub.PublishMessages(); err != nil {
 		return Results{}, Results{}, err
 	}

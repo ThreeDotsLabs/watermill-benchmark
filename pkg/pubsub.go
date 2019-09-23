@@ -33,7 +33,8 @@ type PubSub struct {
 	MessagesCount int
 	MessageSize   int
 
-	Topic string
+	Topic   string
+	Details string
 }
 
 func NewPubSub(name string, topic string, messagesCount int, messageSize int) (PubSub, error) {
@@ -42,7 +43,7 @@ func NewPubSub(name string, topic string, messagesCount int, messageSize int) (P
 		return PubSub{}, fmt.Errorf("unknown PubSub: %s", name)
 	}
 
-	pub, sub := definition.Constructor()
+	pub, sub, details := definition.Constructor()
 
 	if messagesCount == 0 {
 		if definition.MessagesCount != 0 {
@@ -59,6 +60,8 @@ func NewPubSub(name string, topic string, messagesCount int, messageSize int) (P
 		MessagesCount: messagesCount,
 		MessageSize:   messageSize,
 		Topic:         topic,
+
+		Details: details,
 	}, nil
 }
 
@@ -70,27 +73,29 @@ func (ps PubSub) Close() error {
 }
 
 type PubSubDefinition struct {
-	Constructor   func() (message.Publisher, message.Subscriber)
+	Constructor   func() (message.Publisher, message.Subscriber, string)
 	MessagesCount int
 }
 
 var pubSubDefinitions = map[string]PubSubDefinition{
 	"gochannel": {
-		Constructor: func() (message.Publisher, message.Subscriber) {
+		Constructor: func() (message.Publisher, message.Subscriber, string) {
 			pubsub := gochannel.NewGoChannel(gochannel.Config{
 				Persistent: true,
 			}, logger)
-			return pubsub, pubsub
+			return pubsub, pubsub, ""
 		},
 	},
 	"kafka": {
-		Constructor: kafkaConstructor([]string{"kafka:9092"}),
+		MessagesCount: 10000000,
+		Constructor:   kafkaConstructor([]string{"kafka:9092"}),
 	},
 	"kafka-multinode": {
-		Constructor: kafkaConstructor([]string{"kafka1:9091", "kafka2:9092", "kafka3:9093", "kafka4:9094", "kafka5:9095"}),
+		MessagesCount: 10000000,
+		Constructor:   kafkaConstructor([]string{"kafka1:9091", "kafka2:9092", "kafka3:9093", "kafka4:9094", "kafka5:9095"}),
 	},
 	"nats": {
-		Constructor: func() (message.Publisher, message.Subscriber) {
+		Constructor: func() (message.Publisher, message.Subscriber, string) {
 			natsURL := os.Getenv("WATERMILL_NATS_URL")
 			if natsURL == "" {
 				natsURL = "nats://nats-streaming:4222"
@@ -124,11 +129,11 @@ var pubSubDefinitions = map[string]PubSubDefinition{
 				panic(err)
 			}
 
-			return pub, sub
+			return pub, sub, ""
 		},
 	},
 	"googlecloud": {
-		Constructor: func() (message.Publisher, message.Subscriber) {
+		Constructor: func() (message.Publisher, message.Subscriber, string) {
 			// todo - doc hostname
 			pub, err := googlecloud.NewPublisher(
 				googlecloud.PublisherConfig{
@@ -140,6 +145,7 @@ var pubSubDefinitions = map[string]PubSubDefinition{
 				panic(err)
 			}
 
+			subMultiplierCount := 100
 			sub := NewMultiplier(
 				func() (message.Subscriber, error) {
 					subscriber, err := googlecloud.NewSubscriber(
@@ -157,15 +163,15 @@ var pubSubDefinitions = map[string]PubSubDefinition{
 					}
 
 					return subscriber, nil
-				}, 100,
+				}, subMultiplierCount,
 			)
 
-			return pub, sub
+			return pub, sub, fmt.Sprintf("gcloud pub/sub, multiplier: %d", subMultiplierCount)
 		},
 	},
 	"sql": {
-		MessagesCount: 30000,
-		Constructor: func() (message.Publisher, message.Subscriber) {
+		MessagesCount: 1000,
+		Constructor: func() (message.Publisher, message.Subscriber, string) {
 			conf := driver.NewConfig()
 			conf.Net = "tcp"
 			conf.User = "root"
@@ -208,13 +214,13 @@ var pubSubDefinitions = map[string]PubSubDefinition{
 				panic(err)
 			}
 
-			return pub, sub
+			return pub, sub, ""
 		},
 	},
 }
 
-func kafkaConstructor(brokers []string) func() (message.Publisher, message.Subscriber) {
-	return func() (message.Publisher, message.Subscriber) {
+func kafkaConstructor(brokers []string) func() (message.Publisher, message.Subscriber, string) {
+	return func() (message.Publisher, message.Subscriber, string) {
 		publisher, err := kafka.NewPublisher(
 			kafka.PublisherConfig{
 				Brokers:   brokers,
@@ -229,12 +235,19 @@ func kafkaConstructor(brokers []string) func() (message.Publisher, message.Subsc
 		saramaConfig := kafka.DefaultSaramaSubscriberConfig()
 		saramaConfig.Consumer.Offsets.Initial = sarama.OffsetOldest
 
+		partitions := int32(8)
+		replcationFactor := int16(5)
+
 		subscriber, err := kafka.NewSubscriber(
 			kafka.SubscriberConfig{
 				Brokers:               brokers,
 				Unmarshaler:           kafka.DefaultMarshaler{},
 				OverwriteSaramaConfig: saramaConfig,
 				ConsumerGroup:         "benchmark",
+				InitializeTopicDetails: &sarama.TopicDetail{
+					NumPartitions:     partitions,
+					ReplicationFactor: replcationFactor,
+				},
 			},
 			logger,
 		)
@@ -242,7 +255,11 @@ func kafkaConstructor(brokers []string) func() (message.Publisher, message.Subsc
 			panic(err)
 		}
 
-		return publisher, subscriber
+		str := fmt.Sprintf(
+			"kafka, partitions: %d, replication factor: %d, brokers, %d",
+			partitions, replcationFactor, len(brokers),
+		)
+		return publisher, subscriber, str
 	}
 }
 

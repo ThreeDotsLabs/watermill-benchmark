@@ -47,6 +47,10 @@ func (ps PubSub) PublishMessages() error {
 		return err
 	}
 	for ; messagesLeft > 0; messagesLeft-- {
+		if messagesLeft%1000000 == 0 {
+			fmt.Printf("%d messages left\n", messagesLeft)
+		}
+
 		msg := message.NewMessage(newBinaryULID(), msgPayload)
 		addMsg <- msg
 	}
