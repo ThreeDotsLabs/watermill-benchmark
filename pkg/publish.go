@@ -9,6 +9,7 @@ import (
 
 	"github.com/oklog/ulid"
 
+	"github.com/ThreeDotsLabs/watermill"
 	"github.com/ThreeDotsLabs/watermill/message"
 )
 
@@ -42,8 +43,15 @@ func (ps PubSub) PublishMessages() error {
 
 	start := time.Now()
 
+	var uuidFunc func() string
+	if ps.BinaryUUID {
+		uuidFunc = newBinaryULID
+	} else {
+		uuidFunc = watermill.NewULID
+	}
+
 	for ; messagesLeft > 0; messagesLeft-- {
-		msg := message.NewMessage(newBinaryULID(), msgPayload)
+		msg := message.NewMessage(uuidFunc(), msgPayload)
 		addMsg <- msg
 	}
 	close(addMsg)

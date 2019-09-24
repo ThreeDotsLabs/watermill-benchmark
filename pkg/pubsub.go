@@ -35,6 +35,8 @@ type PubSub struct {
 	MessageSize   int
 
 	Topic string
+
+	BinaryUUID bool
 }
 
 func NewPubSub(name string, topic string, messagesCount int, messageSize int) (PubSub, error) {
@@ -60,6 +62,8 @@ func NewPubSub(name string, topic string, messagesCount int, messageSize int) (P
 		MessagesCount: messagesCount,
 		MessageSize:   messageSize,
 		Topic:         topic,
+
+		BinaryUUID: definition.BinaryUUID,
 	}, nil
 }
 
@@ -71,8 +75,9 @@ func (ps PubSub) Close() error {
 }
 
 type PubSubDefinition struct {
-	Constructor   func() (message.Publisher, message.Subscriber)
 	MessagesCount int
+	BinaryUUID    bool
+	Constructor   func() (message.Publisher, message.Subscriber)
 }
 
 var pubSubDefinitions = map[string]PubSubDefinition{
@@ -116,7 +121,7 @@ var pubSubDefinitions = map[string]PubSubDefinition{
 				ClientID:         "benchmark_sub",
 				QueueGroup:       "test-queue",
 				DurableName:      "durable-name",
-				SubscribersCount: 8, // todo - experiment
+				SubscribersCount: 16, // todo - experiment
 				Unmarshaler:      nats.GobMarshaler{},
 				AckWaitTimeout:   time.Second,
 				StanOptions: []stan.Option{
@@ -132,7 +137,6 @@ var pubSubDefinitions = map[string]PubSubDefinition{
 	},
 	"googlecloud": {
 		Constructor: func() (message.Publisher, message.Subscriber) {
-			// todo - doc hostname
 			pub, err := googlecloud.NewPublisher(
 				googlecloud.PublisherConfig{
 					ProjectID: os.Getenv("GOOGLE_CLOUD_PROJECT"),
@@ -168,6 +172,7 @@ var pubSubDefinitions = map[string]PubSubDefinition{
 	},
 	"sql": {
 		MessagesCount: 30000,
+		BinaryUUID:    true,
 		Constructor: func() (message.Publisher, message.Subscriber) {
 			conf := driver.NewConfig()
 			conf.Net = "tcp"
