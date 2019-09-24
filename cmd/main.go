@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	defaultMessageSize   = "256,512,1024"
+	defaultMessageSize = "16,64,256"
 )
 
 var pubsubFlag = flag.String("pubsub", "", "")

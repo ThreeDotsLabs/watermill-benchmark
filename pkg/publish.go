@@ -16,7 +16,7 @@ func (ps PubSub) PublishMessages() error {
 	rand.Seed(time.Now().UnixNano())
 
 	messagesLeft := ps.MessagesCount
-	workers := 200
+	workers := 64
 
 	wg := sync.WaitGroup{}
 	wg.Add(workers)
