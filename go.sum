@@ -15,6 +15,8 @@ github.com/Shopify/toxiproxy v2.1.4+incompatible h1:TKdv8HiTLgE5wdJuEML90aBgNWso
 github.com/Shopify/toxiproxy v2.1.4+incompatible/go.mod h1:OXgGpZ6Cli1/URJOF1DMxUHB2q5Ap20/P/eIdh4G0pI=
 github.com/ThreeDotsLabs/watermill v1.0.0-rc.2 h1:DCKR8kSLHUyZny6LiKtO7h+IZPMo0t9x786FOZmoAh4=
 github.com/ThreeDotsLabs/watermill v1.0.0-rc.2/go.mod h1:gjVFKc8aN+vmEHw3pA0kh4mmuwHe02nyfghb6IWWiKE=
+github.com/ThreeDotsLabs/watermill-amqp v1.0.1 h1:htT8N5hY3A0MM9M9IwaDnpNwpsyOx+Wm6NSWP7WjtcY=
+github.com/ThreeDotsLabs/watermill-amqp v1.0.1/go.mod h1:ZISp8H3YVuoF7WO0LXElb6JyzL3wYdrjHyPSbLH2KS8=
 github.com/ThreeDotsLabs/watermill-googlecloud v1.0.1 h1:8roXIJ9z/wPDguD+nB9SyPeRMpSkLmC4CdUHw6eIAx8=
 github.com/ThreeDotsLabs/watermill-googlecloud v1.0.1/go.mod h1:r2iRWHd5/vetCwLnbYfTyDORydP1ZoPBhEvmvDDx72o=
 github.com/ThreeDotsLabs/watermill-kafka/v2 v2.0.0 h1:+8FeCjF+BgW5b8L7TofMYw8eQUiITF/0evJh38wt3W0=
@@ -169,6 +171,8 @@ github.com/rcrowley/go-metrics v0.0.0-20190706150252-9beb055b7962/go.mod h1:bCqn
 github.com/renstrom/shortuuid v3.0.0+incompatible h1:F6T1U7bWlI3FTV+JE8HyeR7bkTeYZJntqQLA9ST4HOQ=
 github.com/renstrom/shortuuid v3.0.0+incompatible/go.mod h1:n18Ycpn8DijG+h/lLBQVnGKv1BCtTeXo8KKSbBOrQ8c=
 github.com/sirupsen/logrus v1.2.0/go.mod h1:LxeOpSwHxABJmUn/MG1IvRgCAasNZTLOkJPxbbu5VWo=
+github.com/streadway/amqp v0.0.0-20190404075320-75d898a42a94 h1:0ngsPmuP6XIjiFRNFYlvKwSr5zff2v+uPHaffZ6/M4k=
+github.com/streadway/amqp v0.0.0-20190404075320-75d898a42a94/go.mod h1:AZpEONHx3DKn8O/DFsRAY58/XVQiIPMTMB1SddzLXVw=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/objx v0.1.1/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/testify v1.2.2/go.mod h1:a8OnRcib4nhh0OaRAV+Yts87kKdq0PP7pXfy6kDkUVs=

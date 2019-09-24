@@ -12,6 +12,7 @@ import (
 	"github.com/nats-io/stan.go"
 
 	"github.com/ThreeDotsLabs/watermill"
+	"github.com/ThreeDotsLabs/watermill-amqp/pkg/amqp"
 	"github.com/ThreeDotsLabs/watermill-googlecloud/pkg/googlecloud"
 	"github.com/ThreeDotsLabs/watermill-kafka/v2/pkg/kafka"
 	"github.com/ThreeDotsLabs/watermill-nats/pkg/nats"
@@ -206,6 +207,29 @@ var pubSubDefinitions = map[string]PubSubDefinition{
 				},
 				logger,
 			)
+			if err != nil {
+				panic(err)
+			}
+
+			return pub, sub
+		},
+	},
+	"amqp": {
+		MessagesCount: 100000,
+		Constructor: func() (message.Publisher, message.Subscriber) {
+			config := amqp.NewDurablePubSubConfig(
+				"amqp://rabbitmq:5672",
+				func(topic string) string {
+					return topic
+				},
+			)
+
+			pub, err := amqp.NewPublisher(config, logger)
+			if err != nil {
+				panic(err)
+			}
+
+			sub, err := amqp.NewSubscriber(config, logger)
 			if err != nil {
 				panic(err)
 			}

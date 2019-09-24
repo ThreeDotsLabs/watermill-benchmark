@@ -5,6 +5,7 @@ go 1.12
 require (
 	github.com/Shopify/sarama v1.23.1
 	github.com/ThreeDotsLabs/watermill v1.0.0-rc.2
+	github.com/ThreeDotsLabs/watermill-amqp v1.0.1
 	github.com/ThreeDotsLabs/watermill-googlecloud v1.0.1
 	github.com/ThreeDotsLabs/watermill-kafka/v2 v2.0.0
 	github.com/ThreeDotsLabs/watermill-nats v1.0.1
