@@ -160,7 +160,7 @@ var pubSubDefinitions = map[string]PubSubDefinition{
 					}
 
 					return subscriber, nil
-				}, 100,
+				}, 16,
 			)
 
 			return pub, sub
@@ -229,10 +229,15 @@ var pubSubDefinitions = map[string]PubSubDefinition{
 				panic(err)
 			}
 
-			sub, err := amqp.NewSubscriber(config, logger)
-			if err != nil {
-				panic(err)
-			}
+			sub := NewMultiplier(
+				func() (message.Subscriber, error) {
+					sub, err := amqp.NewSubscriber(config, logger)
+					if err != nil {
+						panic(err)
+					}
+					return sub, nil
+				}, 16,
+			)
 
 			return pub, sub
 		},
