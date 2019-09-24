@@ -16,6 +16,10 @@ Keep in mind that final performance depends on multiple factors.
 * Then it will subscribe to the topic and consume all of the messages.
 * Multiple message sizes can be chosen (by default: 16, 64 and 256 bytes).
 
+## Results
+
+See [results.md](results.md).
+
 ## VM Setup
 
 The project includes [Terraform](https://www.terraform.io/) definition for setting up an instance on Google Cloud Platform.
