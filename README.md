@@ -3,6 +3,19 @@
 
 This is an early set of tools for benchmarking [watermill](https://github.com/ThreeDotsLabs/watermill).
 
+**Warning:** This tool is meant to provide a rough estimate on how fast each Pub/Sub can process messages.
+It uses very simplified infrastructure to set things up and default configurations.
+
+Keep in mind that final performance depends on multiple factors.
+
+## How it works
+
+* All tests are run on a single 16 CPU GCloud compute instance (`n1-highcpu-16`).
+* Docker Compose is used to run Pub/Sub infrastructure and benchmark code (except for Google Cloud Pub/Sub).
+* The tool will first produce a big number of messages on a generated topic.
+* Then it will subscribe to the topic and consume all of the messages.
+* Multiple message sizes can be chosen (by default: 16, 64 and 256 bytes).
+
 ## VM Setup
 
 The project includes [Terraform](https://www.terraform.io/) definition for setting up an instance on Google Cloud Platform.
