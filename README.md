@@ -48,9 +48,17 @@ This is an early version of benchmark results. Expect it to be updated and grow.
 
 | Message size (bytes) | Publish (messages / s) | Subscribe (messages / s) |
 | -------------------- | ---------------------- | ------------------------ |
-| 16                   | 6989                   | 143                      |
-| 64                   | 7322                   | 143                      |
-| 256                  | 6897                   | 142                      |
+| 16                   | 7299                   | 154                      |
+| 64                   | 7354                   | 152                      |
+| 256                  | 7253                   | 150                      |
+
+### SQL (PostgreSQL)
+
+| Message size (bytes) | Publish (messages / s) | Subscribe (messages / s) |
+| -------------------- | ---------------------- | ------------------------ |
+| 16                   | 4142                   | 98                       |
+| 64                   | 4040                   | 92                       |
+| 256                  | 3933                   | 78                       |
 
 ### Google Cloud Pub/Sub (16 subscribers)
 
