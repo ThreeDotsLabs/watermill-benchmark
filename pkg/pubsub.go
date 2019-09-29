@@ -9,6 +9,7 @@ import (
 
 	"github.com/Shopify/sarama"
 	driver "github.com/go-sql-driver/mysql"
+	_ "github.com/lib/pq"
 	"github.com/nats-io/stan.go"
 
 	"github.com/ThreeDotsLabs/watermill"
@@ -36,7 +37,7 @@ type PubSub struct {
 
 	Topic string
 
-	BinaryUUID bool
+	UUIDFunc func() string
 }
 
 func NewPubSub(name string, topic string, messagesCount int, messageSize int) (PubSub, error) {
@@ -63,7 +64,7 @@ func NewPubSub(name string, topic string, messagesCount int, messageSize int) (P
 		MessageSize:   messageSize,
 		Topic:         topic,
 
-		BinaryUUID: definition.BinaryUUID,
+		UUIDFunc: definition.UUIDFunc,
 	}, nil
 }
 
@@ -76,7 +77,7 @@ func (ps PubSub) Close() error {
 
 type PubSubDefinition struct {
 	MessagesCount int
-	BinaryUUID    bool
+	UUIDFunc      func() string
 	Constructor   func() (message.Publisher, message.Subscriber)
 }
 
@@ -170,9 +171,9 @@ var pubSubDefinitions = map[string]PubSubDefinition{
 			return pub, sub
 		},
 	},
-	"sql": {
+	"mysql": {
 		MessagesCount: 30000,
-		BinaryUUID:    true,
+		UUIDFunc:      newBinaryULID,
 		Constructor: func() (message.Publisher, message.Subscriber) {
 			conf := driver.NewConfig()
 			conf.Net = "tcp"
@@ -207,6 +208,50 @@ var pubSubDefinitions = map[string]PubSubDefinition{
 				sql.SubscriberConfig{
 					SchemaAdapter:    MySQLSchema{},
 					OffsetsAdapter:   sql.DefaultMySQLOffsetsAdapter{},
+					ConsumerGroup:    watermill.NewULID(),
+					InitializeSchema: true,
+				},
+				logger,
+			)
+			if err != nil {
+				panic(err)
+			}
+
+			return pub, sub
+		},
+	},
+	"postgresql": {
+		MessagesCount: 30000,
+		UUIDFunc:      watermill.NewUUID,
+		Constructor: func() (message.Publisher, message.Subscriber) {
+			dsn := "postgres://watermill:password@postgres:5432/watermill?sslmode=disable"
+			db, err := stdSQL.Open("postgres", dsn)
+			if err != nil {
+				panic(err)
+			}
+
+			err = db.Ping()
+			if err != nil {
+				panic(err)
+			}
+
+			pub, err := sql.NewPublisher(
+				db,
+				sql.PublisherConfig{
+					AutoInitializeSchema: true,
+					SchemaAdapter:        PostgreSQLSchema{},
+				},
+				logger,
+			)
+			if err != nil {
+				panic(err)
+			}
+
+			sub, err := sql.NewSubscriber(
+				db,
+				sql.SubscriberConfig{
+					SchemaAdapter:    PostgreSQLSchema{},
+					OffsetsAdapter:   sql.DefaultPostgreSQLOffsetsAdapter{},
 					ConsumerGroup:    watermill.NewULID(),
 					InitializeSchema: true,
 				},
@@ -283,7 +328,7 @@ func kafkaConstructor(brokers []string) func() (message.Publisher, message.Subsc
 }
 
 type MySQLSchema struct {
-	sql.DefaultSchema
+	sql.DefaultMySQLSchema
 }
 
 func (m MySQLSchema) SchemaInitializingQueries(topic string) []string {
@@ -295,6 +340,24 @@ func (m MySQLSchema) SchemaInitializingQueries(topic string) []string {
 		"`payload` BLOB DEFAULT NULL,",
 		"`metadata` JSON DEFAULT NULL",
 		");",
+	}, "\n")
+
+	return []string{createMessagesTable}
+}
+
+type PostgreSQLSchema struct {
+	sql.DefaultPostgreSQLSchema
+}
+
+func (p PostgreSQLSchema) SchemaInitializingQueries(topic string) []string {
+	createMessagesTable := strings.Join([]string{
+		`CREATE TABLE IF NOT EXISTS ` + p.MessagesTable(topic) + ` (`,
+		`"offset" SERIAL,`,
+		`"uuid" UUID NOT NULL,`,
+		`"created_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,`,
+		`"payload" BYTEA DEFAULT NULL,`,
+		`"metadata" JSON DEFAULT NULL`,
+		`);`,
 	}, "\n")
 
 	return []string{createMessagesTable}
