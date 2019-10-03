@@ -9,7 +9,7 @@ require (
 	github.com/ThreeDotsLabs/watermill-googlecloud v1.0.1
 	github.com/ThreeDotsLabs/watermill-kafka/v2 v2.0.0
 	github.com/ThreeDotsLabs/watermill-nats v1.0.1
-	github.com/ThreeDotsLabs/watermill-sql v1.0.1-0.20190929140138-cc53b9e2bd23
+	github.com/ThreeDotsLabs/watermill-sql v1.1.0
 	github.com/go-sql-driver/mysql v1.4.1
 	github.com/hashicorp/go-multierror v1.0.0
 	github.com/lib/pq v1.2.0
