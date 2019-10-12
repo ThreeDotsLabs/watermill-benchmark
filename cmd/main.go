@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/ThreeDotsLabs/watermill/tools/benchmark/pkg"
+	"github.com/ThreeDotsLabs/watermill-benchmark/pkg"
 )
 
 const (
