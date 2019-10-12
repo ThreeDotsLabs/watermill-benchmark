@@ -44,8 +44,8 @@ func (ps PubSub) PublishMessages() error {
 	start := time.Now()
 
 	var uuidFunc func() string
-	if ps.BinaryUUID {
-		uuidFunc = newBinaryULID
+	if ps.UUIDFunc != nil {
+		uuidFunc = ps.UUIDFunc
 	} else {
 		uuidFunc = watermill.NewULID
 	}
