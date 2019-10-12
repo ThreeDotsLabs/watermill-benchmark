@@ -1,4 +1,4 @@
-module github.com/ThreeDotsLabs/watermill/tools/benchmark
+module github.com/ThreeDotsLabs/watermill-benchmark
 
 go 1.12
 
