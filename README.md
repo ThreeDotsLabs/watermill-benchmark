@@ -56,9 +56,9 @@ This is an early version of benchmark results. Expect it to be updated and grow.
 
 | Message size (bytes) | Publish (messages / s) | Subscribe (messages / s) |
 | -------------------- | ---------------------- | ------------------------ |
-| 16                   | 4,142                  | 98                       |
-| 64                   | 4,040                  | 92                       |
-| 256                  | 3,933                  | 78                       |
+| 16                   | 4,070                  | 396                      |
+| 64                   | 3,895                  | 380                      |
+| 256                  | 3,820                  | 378                      |
 
 ### Google Cloud Pub/Sub (16 subscribers)
 

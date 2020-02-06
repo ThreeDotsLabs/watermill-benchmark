@@ -4,11 +4,6 @@ provider "google" {
   region      = "europe-north1"
 }
 
-data "google_compute_image" "ubuntu_18" {
-  family  = "ubuntu-1904"
-  project = "ubuntu-os-cloud"
-}
-
 resource "google_compute_instance" "default" {
   name         = "benchmark-${formatdate("YYYYMMDDhhmmss", timestamp())}"
   machine_type = "n1-highcpu-16"
@@ -18,7 +13,7 @@ resource "google_compute_instance" "default" {
     initialize_params {
       size  = 128
       type = "pd-ssd"
-      image = "${data.google_compute_image.ubuntu_18.self_link}"
+      image = "ubuntu-1904-disco-v20190619"
     }
   }
 
