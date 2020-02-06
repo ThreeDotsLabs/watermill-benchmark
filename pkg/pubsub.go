@@ -352,7 +352,7 @@ type PostgreSQLSchema struct {
 func (p PostgreSQLSchema) SchemaInitializingQueries(topic string) []string {
 	createMessagesTable := strings.Join([]string{
 		`CREATE TABLE IF NOT EXISTS ` + p.MessagesTable(topic) + ` (`,
-		`"offset" SERIAL,`,
+		`"offset" SERIAL PRIMARY KEY,`,
 		`"uuid" UUID NOT NULL,`,
 		`"created_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,`,
 		`"payload" BYTEA DEFAULT NULL,`,
