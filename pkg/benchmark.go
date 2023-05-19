@@ -3,10 +3,12 @@ package pkg
 import (
 	"context"
 	"fmt"
+	"strings"
 	"sync"
 	"time"
 
 	"github.com/ThreeDotsLabs/watermill"
+	"github.com/ThreeDotsLabs/watermill/message"
 )
 
 type Results struct {
@@ -95,6 +97,12 @@ func initialise(pubSubName string, topic string) error {
 		return err
 	}
 
+	if si, ok := pubsub.Subscriber.(message.SubscribeInitializer); ok && strings.Contains(pubSubName, "nats") {
+		err = si.SubscribeInitialize(topic)
+		if err != nil {
+			return err
+		}
+	}
 	if _, err := pubsub.Subscriber.Subscribe(context.Background(), topic); err != nil {
 		return err
 	}

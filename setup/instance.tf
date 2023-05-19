@@ -13,7 +13,7 @@ resource "google_compute_instance" "default" {
     initialize_params {
       size  = 128
       type = "pd-ssd"
-      image = "ubuntu-1904-disco-v20190619"
+      image = "ubuntu-2004-focal-v20230605"
     }
   }
 
