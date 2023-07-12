@@ -4,22 +4,23 @@ import (
 	stdSQL "database/sql"
 	"fmt"
 	"os"
+	"runtime"
+	"strconv"
 	"strings"
-	"time"
 
 	"github.com/Shopify/sarama"
-	driver "github.com/go-sql-driver/mysql"
-	_ "github.com/lib/pq"
-	"github.com/nats-io/stan.go"
-
 	"github.com/ThreeDotsLabs/watermill"
-	"github.com/ThreeDotsLabs/watermill-amqp/pkg/amqp"
+	"github.com/ThreeDotsLabs/watermill-amqp/v2/pkg/amqp"
 	"github.com/ThreeDotsLabs/watermill-googlecloud/pkg/googlecloud"
 	"github.com/ThreeDotsLabs/watermill-kafka/v2/pkg/kafka"
-	"github.com/ThreeDotsLabs/watermill-nats/pkg/nats"
+	"github.com/ThreeDotsLabs/watermill-nats/v2/pkg/nats"
+	"github.com/ThreeDotsLabs/watermill-redisstream/pkg/redisstream"
 	"github.com/ThreeDotsLabs/watermill-sql/pkg/sql"
 	"github.com/ThreeDotsLabs/watermill/message"
 	"github.com/ThreeDotsLabs/watermill/pubsub/gochannel"
+	driver "github.com/go-sql-driver/mysql"
+	_ "github.com/lib/pq"
+	"github.com/redis/go-redis/v9"
 )
 
 const (
@@ -91,43 +92,45 @@ var pubSubDefinitions = map[string]PubSubDefinition{
 		},
 	},
 	"kafka": {
-		MessagesCount: 20000000,
+		MessagesCount: 5000000,
 		Constructor:   kafkaConstructor([]string{"kafka:9092"}),
 	},
 	"kafka-multinode": {
-		MessagesCount: 20000000,
+		MessagesCount: 5000000,
 		Constructor:   kafkaConstructor([]string{"kafka1:9091", "kafka2:9092", "kafka3:9093", "kafka4:9094", "kafka5:9095"}),
 	},
-	"nats": {
+	"nats-jetstream": {
+		MessagesCount: 5000000,
 		Constructor: func() (message.Publisher, message.Subscriber) {
 			natsURL := os.Getenv("WATERMILL_NATS_URL")
 			if natsURL == "" {
-				natsURL = "nats://nats-streaming:4222"
+				natsURL = "nats://nats:4222"
 			}
 
-			pub, err := nats.NewStreamingPublisher(nats.StreamingPublisherConfig{
-				ClusterID: "test-cluster",
-				ClientID:  "benchmark_pub",
-				StanOptions: []stan.Option{
-					stan.NatsURL(natsURL),
-				},
-				Marshaler: nats.GobMarshaler{},
+			jsConfig := nats.JetStreamConfig{
+				AutoProvision: false,
+			}
+
+			ackAsyncString := os.Getenv("WATERMILL_NATS_ACK_ASYNC")
+			if strings.EqualFold(ackAsyncString, "true") {
+				jsConfig.AckAsync = true
+			}
+
+			pub, err := nats.NewPublisher(nats.PublisherConfig{
+				URL:       natsURL,
+				Marshaler: &nats.NATSMarshaler{},
+				JetStream: jsConfig,
 			}, logger)
 			if err != nil {
 				panic(err)
 			}
 
-			sub, err := nats.NewStreamingSubscriber(nats.StreamingSubscriberConfig{
-				ClusterID:        "test-cluster",
-				ClientID:         "benchmark_sub",
-				QueueGroup:       "test-queue",
-				DurableName:      "durable-name",
-				SubscribersCount: 16, // todo - experiment
-				Unmarshaler:      nats.GobMarshaler{},
-				AckWaitTimeout:   time.Second,
-				StanOptions: []stan.Option{
-					stan.NatsURL(natsURL),
-				},
+			sub, err := nats.NewSubscriber(nats.SubscriberConfig{
+				URL:              natsURL,
+				QueueGroupPrefix: "benchmark",
+				SubscribersCount: subscribersCount(),
+				Unmarshaler:      &nats.NATSMarshaler{},
+				JetStream:        jsConfig,
 			}, logger)
 			if err != nil {
 				panic(err)
@@ -136,6 +139,7 @@ var pubSubDefinitions = map[string]PubSubDefinition{
 			return pub, sub
 		},
 	},
+
 	"googlecloud": {
 		Constructor: func() (message.Publisher, message.Subscriber) {
 			pub, err := googlecloud.NewPublisher(
@@ -165,7 +169,7 @@ var pubSubDefinitions = map[string]PubSubDefinition{
 					}
 
 					return subscriber, nil
-				}, 16,
+				}, subscribersCount(),
 			)
 
 			return pub, sub
@@ -286,12 +290,62 @@ var pubSubDefinitions = map[string]PubSubDefinition{
 						panic(err)
 					}
 					return sub, nil
-				}, 16,
+				}, subscribersCount(),
 			)
 
 			return pub, sub
 		},
 	},
+	"redis": {
+		Constructor: func() (message.Publisher, message.Subscriber) {
+			subClient := redis.NewClient(&redis.Options{
+				Addr: "redis:6379",
+				DB:   0,
+			})
+			subscriber, err := redisstream.NewSubscriber(
+				redisstream.SubscriberConfig{
+					Client:        subClient,
+					Unmarshaller:  redisstream.DefaultMarshallerUnmarshaller{},
+					ConsumerGroup: "test_consumer_group",
+				},
+				watermill.NewStdLogger(false, false),
+			)
+			if err != nil {
+				panic(err)
+			}
+
+			pubClient := redis.NewClient(&redis.Options{
+				Addr: "redis:6379",
+				DB:   0,
+			})
+			publisher, err := redisstream.NewPublisher(
+				redisstream.PublisherConfig{
+					Client:     pubClient,
+					Marshaller: redisstream.DefaultMarshallerUnmarshaller{},
+				},
+				watermill.NewStdLogger(false, false),
+			)
+			if err != nil {
+				panic(err)
+			}
+
+			return publisher, subscriber
+		},
+	},
+}
+
+func subscribersCount() int {
+	var (
+		mult = 1
+		err  error
+	)
+	if ev := os.Getenv("SUBSCRIBER_CPU_MULTIPLIER"); ev != "" {
+		mult, err = strconv.Atoi(ev)
+		if err != nil {
+			panic(fmt.Sprintf("invalid SUBSCRIBER_CPU_MULTIPLIER: %s", err.Error()))
+		}
+	}
+	return runtime.NumCPU() * mult
 }
 
 func kafkaConstructor(brokers []string) func() (message.Publisher, message.Subscriber) {
