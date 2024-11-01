@@ -1,7 +1,7 @@
 # Watermill Benchmark
-<img align="right" width="200" src="https://threedots.tech/watermill-io/watermill-logo.png">
+<img align="right" width="300" src="https://watermill.io/img/gopher.svg">
 
-This is an early set of tools for benchmarking [watermill](https://github.com/ThreeDotsLabs/watermill).
+This is a set of tools for benchmarking [watermill](https://github.com/ThreeDotsLabs/watermill).
 
 **Warning:** This tool is meant to provide a rough estimate on how fast each Pub/Sub can process messages.
 It uses very simplified infrastructure to set things up and default configurations.
@@ -16,9 +16,7 @@ Keep in mind that final performance depends on multiple factors.
 * Then it will subscribe to the topic and consume all of the messages.
 * Multiple message sizes can be chosen (by default: 16, 64 and 256 bytes).
 
-## Results
-
-This is an early version of benchmark results. Expect it to be updated and grow.
+## Results (as of 1 November 2024)
 
 ### Kafka (one node)
 

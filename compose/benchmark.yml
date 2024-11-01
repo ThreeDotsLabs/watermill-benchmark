@@ -1,4 +1,3 @@
-version: '3'
 services:
   benchmark:
     image: golang:1.23
