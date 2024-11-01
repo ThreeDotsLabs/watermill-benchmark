@@ -62,9 +62,9 @@ Keep in mind that final performance depends on multiple factors.
 
 | Message size (bytes) | Publish (messages / s) | Subscribe (messages / s) |
 |----------------------|------------------------|--------------------------|
-| 16                   | 3,834                  | 455                      |
-| 64                   | 3,923                  | 468                      |
-| 256                  | 3,855                  | 472                      |
+| 16                   | 2,464                  | 9,460                    |
+| 64                   | 2,487                  | 9,045                    |
+| 256                  | 2,300                  | 7,843                    |
 
 ### Google Cloud Pub/Sub (16 subscribers)
 
