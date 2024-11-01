@@ -1,6 +1,6 @@
 services:
   rabbitmq:
-    image: rabbitmq:3.7-management
+    image: rabbitmq:4.0
     restart: unless-stopped
     ports:
       - 5672:5672

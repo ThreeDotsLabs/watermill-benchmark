@@ -50,7 +50,7 @@ Keep in mind that final performance depends on multiple factors.
 | 64                   | 58,554                 | 11,252                   |
 | 256                  | 58,906                 | 11,408                   |
 
-### SQL (MySQL)
+### SQL (MySQL, batch size 100)
 
 | Message size (bytes) | Publish (messages / s) | Subscribe (messages / s) |
 |----------------------|------------------------|--------------------------|
@@ -58,7 +58,7 @@ Keep in mind that final performance depends on multiple factors.
 | 64                   | 5,625                  | 168                      |
 | 256                  | 5,381                  | 164                      |
 
-### SQL (PostgreSQL)
+### SQL (PostgreSQL, batch size 100)
 
 | Message size (bytes) | Publish (messages / s) | Subscribe (messages / s) |
 |----------------------|------------------------|--------------------------|
@@ -78,17 +78,17 @@ Keep in mind that final performance depends on multiple factors.
 
 | Message size (bytes) | Publish (messages / s) | Subscribe (messages / s) |
 |----------------------|------------------------|--------------------------|
-| 16                   | 2,702                  | 13,192                   |
-| 64                   | 2,712                  | 12,980                   |
-| 256                  | 2,692                  | 8,027                    |
+| 16                   | 2,770                  | 14,604                   |
+| 64                   | 2,752                  | 12,128                   |
+| 256                  | 2,750                  | 8,550                    |
 
 ### GoChannel
 
 | Message size (bytes) | Publish (messages / s) | Subscribe (messages / s) |
 |----------------------|------------------------|--------------------------|
-| 16                   | 331,882                | 118,943                  |
-| 64                   | 298,847                | 123,499                  |
-| 256                  | 373,053                | 130,940                  |
+| 16                   | 318,686                | 137,239                  |
+| 64                   | 307,533                | 145,651                  |
+| 256                  | 304,253                | 151,295                  |
 
 ## VM Setup
 

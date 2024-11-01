@@ -1,6 +1,6 @@
 services:
   mysql:
-    image: mysql:8.0
+    image: mysql:9.1
     restart: unless-stopped
     command: --max-connections 2048
     ports:
