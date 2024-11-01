@@ -31,7 +31,8 @@ func RunBenchmark(pubSubName string, messagesCount int, messageSize int) (Result
 		return Results{}, Results{}, err
 	}
 
-	if err := pubsub.PublishMessages(); err != nil {
+	pubResults, err := pubsub.PublishMessages()
+	if err != nil {
 		return Results{}, Results{}, err
 	}
 
@@ -73,11 +74,6 @@ func RunBenchmark(pubSubName string, messagesCount int, messageSize int) (Result
 
 	if err := pubsub.Close(); err != nil {
 		return Results{}, Results{}, err
-	}
-
-	pubResults := Results{
-		Count:       pubsub.MessagesCount,
-		MessageSize: pubsub.MessageSize,
 	}
 
 	subResults := Results{

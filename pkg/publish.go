@@ -3,7 +3,6 @@ package pkg
 import (
 	cryptoRand "crypto/rand"
 	"fmt"
-	"math/rand"
 	"sync"
 	"time"
 
@@ -13,9 +12,7 @@ import (
 	"github.com/ThreeDotsLabs/watermill/message"
 )
 
-func (ps PubSub) PublishMessages() error {
-	rand.Seed(time.Now().UnixNano())
-
+func (ps PubSub) PublishMessages() (Results, error) {
 	messagesLeft := ps.MessagesCount
 	workers := 64
 
@@ -38,7 +35,7 @@ func (ps PubSub) PublishMessages() error {
 
 	msgPayload, err := ps.payload()
 	if err != nil {
-		return err
+		return Results{}, err
 	}
 
 	start := time.Now()
@@ -62,7 +59,12 @@ func (ps PubSub) PublishMessages() error {
 
 	fmt.Printf("added %d messages in %s, %f msg/s\n", ps.MessagesCount, elapsed, float64(ps.MessagesCount)/elapsed.Seconds())
 
-	return nil
+	return Results{
+		Count:          ps.MessagesCount,
+		MessageSize:    ps.MessageSize,
+		MeanRate:       float64(ps.MessagesCount) / elapsed.Seconds(),
+		MeanThroughput: float64(ps.MessagesCount*ps.MessageSize) / elapsed.Seconds(),
+	}, nil
 }
 
 func newBinaryULID() string {
@@ -75,7 +77,7 @@ func newBinaryULID() string {
 
 func (ps PubSub) payload() ([]byte, error) {
 	msgPayload := make([]byte, ps.MessageSize)
-	_, err := rand.Read(msgPayload)
+	_, err := cryptoRand.Read(msgPayload)
 	if err != nil {
 		return nil, err
 	}
