@@ -412,7 +412,7 @@ func (p PostgreSQLSchema) SchemaInitializingQueries(topic string) []sql.Query {
 		`"payload" BYTEA DEFAULT NULL,`,
 		`"metadata" JSON DEFAULT NULL`,
 		`"transaction_id" xid8 NOT NULL,`,
-		`"PRIMARY KEY ("transaction_id", "offset")`,
+		`PRIMARY KEY ("transaction_id", "offset")`,
 		`);`,
 	}, "\n")
 
