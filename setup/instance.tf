@@ -1,5 +1,4 @@
 provider "google" {
-  credentials = "${file(var.credentials_path)}"
   project     = "${var.project}"
   region      = "europe-north1"
 }
@@ -13,14 +12,13 @@ resource "google_compute_instance" "default" {
     initialize_params {
       size  = 128
       type = "pd-ssd"
-      image = "ubuntu-2004-focal-v20230605"
+      image = "ubuntu-2204-jammy-v20240927"
     }
   }
 
   network_interface {
     network = "default"
-    access_config {
-    }
+    access_config {}
   }
 
   metadata = {
@@ -34,6 +32,5 @@ output "public_ip" {
   value = "${google_compute_instance.default.network_interface.0.access_config.0.nat_ip}"
 }
 
-variable "credentials_path" {}
 variable "project" {}
 variable "pub_key_path" {}

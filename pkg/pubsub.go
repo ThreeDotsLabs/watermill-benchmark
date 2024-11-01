@@ -10,12 +10,12 @@ import (
 
 	"github.com/Shopify/sarama"
 	"github.com/ThreeDotsLabs/watermill"
-	"github.com/ThreeDotsLabs/watermill-amqp/v2/pkg/amqp"
+	"github.com/ThreeDotsLabs/watermill-amqp/v3/pkg/amqp"
 	"github.com/ThreeDotsLabs/watermill-googlecloud/pkg/googlecloud"
-	"github.com/ThreeDotsLabs/watermill-kafka/v2/pkg/kafka"
+	"github.com/ThreeDotsLabs/watermill-kafka/v3/pkg/kafka"
 	"github.com/ThreeDotsLabs/watermill-nats/v2/pkg/nats"
 	"github.com/ThreeDotsLabs/watermill-redisstream/pkg/redisstream"
-	"github.com/ThreeDotsLabs/watermill-sql/pkg/sql"
+	"github.com/ThreeDotsLabs/watermill-sql/v3/pkg/sql"
 	"github.com/ThreeDotsLabs/watermill/message"
 	"github.com/ThreeDotsLabs/watermill/pubsub/gochannel"
 	driver "github.com/go-sql-driver/mysql"
@@ -385,7 +385,7 @@ type MySQLSchema struct {
 	sql.DefaultMySQLSchema
 }
 
-func (m MySQLSchema) SchemaInitializingQueries(topic string) []string {
+func (m MySQLSchema) SchemaInitializingQueries(topic string) []sql.Query {
 	createMessagesTable := strings.Join([]string{
 		"CREATE TABLE IF NOT EXISTS " + m.MessagesTable(topic) + " (",
 		"`offset` BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,",
@@ -396,14 +396,14 @@ func (m MySQLSchema) SchemaInitializingQueries(topic string) []string {
 		");",
 	}, "\n")
 
-	return []string{createMessagesTable}
+	return []sql.Query{{Query: createMessagesTable}}
 }
 
 type PostgreSQLSchema struct {
 	sql.DefaultPostgreSQLSchema
 }
 
-func (p PostgreSQLSchema) SchemaInitializingQueries(topic string) []string {
+func (p PostgreSQLSchema) SchemaInitializingQueries(topic string) []sql.Query {
 	createMessagesTable := strings.Join([]string{
 		`CREATE TABLE IF NOT EXISTS ` + p.MessagesTable(topic) + ` (`,
 		`"offset" SERIAL PRIMARY KEY,`,
@@ -414,5 +414,5 @@ func (p PostgreSQLSchema) SchemaInitializingQueries(topic string) []string {
 		`);`,
 	}, "\n")
 
-	return []string{createMessagesTable}
+	return []sql.Query{{Query: createMessagesTable}}
 }

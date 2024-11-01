@@ -101,8 +101,6 @@ It will spin up a fresh Ubuntu 19.04 instance, install docker with dependencies 
 Set environment variables:
 
 ```bash
-# path to GCP credentials file
-TF_VAR_credentials_path=
 # project name on GCP
 TF_VAR_project=
 # public part of the key that you will use to access SSH
