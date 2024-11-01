@@ -404,17 +404,17 @@ type PostgreSQLSchema struct {
 }
 
 func (p PostgreSQLSchema) SchemaInitializingQueries(topic string) []sql.Query {
-	createMessagesTable := strings.Join([]string{
-		`CREATE TABLE IF NOT EXISTS ` + p.MessagesTable(topic) + ` (`,
-		`"offset" BIGSERIAL,`,
-		`"uuid" UUID NOT NULL,`,
-		`"created_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,`,
-		`"payload" BYTEA DEFAULT NULL,`,
-		`"metadata" JSON DEFAULT NULL`,
-		`"transaction_id" xid8 NOT NULL,`,
-		`PRIMARY KEY ("transaction_id", "offset")`,
-		`);`,
-	}, "\n")
+	createMessagesTable := ` 
+		CREATE TABLE IF NOT EXISTS ` + p.MessagesTable(topic) + ` (
+			"offset" BIGSERIAL,
+			"uuid" UUID NOT NULL,
+			"created_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+			"payload" BYTEA DEFAULT NULL,
+			"metadata" JSON DEFAULT NULL,
+			"transaction_id" xid8 NOT NULL,
+			PRIMARY KEY ("transaction_id", "offset")
+		);
+	`
 
 	return []sql.Query{{Query: createMessagesTable}}
 }
