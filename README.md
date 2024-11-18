@@ -16,15 +16,15 @@ Keep in mind that final performance depends on multiple factors.
 * Then it will subscribe to the topic and consume all of the messages.
 * Multiple message sizes can be chosen (by default: 16, 64 and 256 bytes).
 
-## Results (as of 1 November 2024)
+## Results (as of 18 November 2024)
 
 ### Kafka (one node)
 
 | Message size (bytes) | Publish (messages / s) | Subscribe (messages / s) |
-| -------------------- |------------------------|--------------------------|
-| 16                   | 44,090                 | 108.285                  |
-| 64                   | 41,371                 | 108,848                  |
-| 256                  | 41,497                 | 111,756                  |
+|----------------------|------------------------|--------------------------|
+| 16                   | 41,492                 | 101,669                  |
+| 64                   | 40,189                 | 106,264                  |
+| 256                  | 40,044                 | 107,278                  |
 
 ### NATS Jetstream (16 Subscribers)
 
@@ -36,11 +36,11 @@ Keep in mind that final performance depends on multiple factors.
 
 ### NATS Jetstream (48 Subscribers)
 
-| Message size (bytes) | Publish (messages / s) | Subscribe (messages / s) | Subscribe (messages / s - async ack) |
+| Message size (bytes) | Publish (messages / s) | Subscribe (messages /s ) | Subscribe (messages / s - async ack) |
 |----------------------|------------------------|--------------------------|--------------------------------------|
-| 16                   | 48,882                 | 45,275                   | 90,917                               |
-| 64                   | 48,681                 | 44,746                   | 89,527                               |
-| 256                  | 48,097                 | 44,487                   | 90,510                               |
+| 16                   | 50,680                 | 46,377                   | 86,348                               |
+| 64                   | 49,341                 | 46,307                   | 86,078                               |
+| 256                  | 48,744                 | 46,035                   | 86,499                               |
 
 ### Redis
 
@@ -69,7 +69,7 @@ Keep in mind that final performance depends on multiple factors.
 ### Google Cloud Pub/Sub (16 subscribers)
 
 | Message size (bytes) | Publish (messages / s) | Subscribe (messages / s) |
-| -------------------- |------------------------|--------------------------|
+|----------------------|------------------------|--------------------------|
 | 16                   | 3,689                  | 30,229                   |
 | 64                   | 3,408                  | 26,448                   |
 | 256                  | 6,967                  | 30,123                   |
