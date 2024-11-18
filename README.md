@@ -66,6 +66,14 @@ Keep in mind that final performance depends on multiple factors.
 | 64                   | 2,487                  | 9,045                    |
 | 256                  | 2,300                  | 7,843                    |
 
+### SQL (PostgreSQL Queue, batch size 100)
+
+| Message size (bytes) | Publish (messages / s) | Subscribe (messages / s) |
+|----------------------|------------------------|--------------------------|
+| 16                   | 2,551                  | 10,466                   |
+| 64                   | 2,585                  | 9,626                    |
+| 256                  | 2,320                  | 8,276                    |
+
 ### Google Cloud Pub/Sub (16 subscribers)
 
 | Message size (bytes) | Publish (messages / s) | Subscribe (messages / s) |

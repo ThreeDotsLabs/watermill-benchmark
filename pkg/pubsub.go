@@ -308,7 +308,6 @@ var pubSubDefinitions = map[string]PubSubDefinition{
 						},
 					},
 					OffsetsAdapter:   sql.PostgreSQLQueueOffsetsAdapter{},
-					ConsumerGroup:    watermill.NewULID(),
 					InitializeSchema: true,
 				},
 				logger,
