@@ -30,9 +30,9 @@ Keep in mind that final performance depends on multiple factors.
 
 | Message size (bytes) | Publish (messages / s) | Subscribe (messages / s) | Subscribe (messages / s - async ack) |
 |----------------------|------------------------|--------------------------|--------------------------------------|
-| 16                   | 49,255                 | 33,009                   | 63,065                               |
-| 64                   | 49,296                 | 33,016                   | 62,667                               |
-| 256                  | 48.488                 | 32,573                   | 62,745                               |
+| 16                   | 50,668                 | 34,713                   | 59,728                               |
+| 64                   | 49,204                 | 34,561                   | 59,743                               |
+| 256                  | 48,242                 | 34,097                   | 59,385                               |
 
 ### NATS Jetstream (48 Subscribers)
 
@@ -46,9 +46,9 @@ Keep in mind that final performance depends on multiple factors.
 
 | Message size (bytes) | Publish (messages / s) | Subscribe (messages / s) |
 |----------------------|------------------------|--------------------------|
-| 16                   | 61,642                 | 11,213                   |
-| 64                   | 58,554                 | 11,252                   |
-| 256                  | 58,906                 | 11,408                   |
+| 16                   | 59,158                 | 12,134                   |
+| 64                   | 58,988                 | 12,392                   |
+| 256                  | 58,038                 | 12,133                   |
 
 ### SQL (MySQL, batch size 100)
 
@@ -86,9 +86,9 @@ Keep in mind that final performance depends on multiple factors.
 
 | Message size (bytes) | Publish (messages / s) | Subscribe (messages / s) |
 |----------------------|------------------------|--------------------------|
-| 16                   | 318,686                | 137,239                  |
-| 64                   | 307,533                | 145,651                  |
-| 256                  | 304,253                | 151,295                  |
+| 16                   | 315,776                | 138,743                  |
+| 64                   | 325,341                | 163,034                  |
+| 256                  | 341,223                | 145,718                  |
 
 ## VM Setup
 

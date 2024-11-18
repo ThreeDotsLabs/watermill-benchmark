@@ -1,6 +1,6 @@
 module github.com/ThreeDotsLabs/watermill-benchmark
 
-go 1.21
+go 1.23
 
 toolchain go1.23.0
 
@@ -30,6 +30,7 @@ require (
 	cloud.google.com/go/pubsub v1.42.0 // indirect
 	github.com/IBM/sarama v1.43.3 // indirect
 	github.com/Rican7/retry v0.3.1 // indirect
+	github.com/ThreeDotsLabs/watermill-sql/v4 v4.0.0-rc.1 // indirect
 	github.com/cenkalti/backoff/v3 v3.2.2 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
