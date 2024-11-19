@@ -8,6 +8,9 @@ It uses very simplified infrastructure to set things up and default configuratio
 
 Keep in mind that final performance depends on multiple factors.
 
+**It's not meant to be a definitive answer on which Pub/Sub is the fastest.**
+It should give you an idea of the ballpark performance you can expect.
+
 ## How it works
 
 * All tests are run on a single 16 CPU GCloud compute instance (`n1-highcpu-16`).
@@ -54,9 +57,9 @@ Keep in mind that final performance depends on multiple factors.
 
 | Message size (bytes) | Publish (messages / s) | Subscribe (messages / s) |
 |----------------------|------------------------|--------------------------|
-| 16                   | 5,599                  | 167                      |
-| 64                   | 5,625                  | 168                      |
-| 256                  | 5,381                  | 164                      |
+| 16                   | 5,732                  | 2,794                    |
+| 64                   | 5,961                  | 2,637                    |
+| 256                  | 5,627                  | 2,766                    |
 
 ### SQL (PostgreSQL, batch size 100)
 
@@ -78,9 +81,9 @@ Keep in mind that final performance depends on multiple factors.
 
 | Message size (bytes) | Publish (messages / s) | Subscribe (messages / s) |
 |----------------------|------------------------|--------------------------|
-| 16                   | 3,689                  | 30,229                   |
-| 64                   | 3,408                  | 26,448                   |
-| 256                  | 6,967                  | 30,123                   |
+| 16                   | 3,027                  | 28,589                   |
+| 64                   | 3,020                  | 31,057                   |
+| 256                  | 2,918                  | 32,722                   |
 
 ### AMQP (RabbitMQ, 16 subscribers)
 
