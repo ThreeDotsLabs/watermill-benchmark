@@ -53,29 +53,35 @@ It should give you an idea of the ballpark performance you can expect.
 | 64                   | 58,988                 | 12,392                   |
 | 256                  | 58,038                 | 12,133                   |
 
-### SQL (MySQL, batch size 100)
+### SQL (MySQL)
+
+| Message size (bytes) | Publish (messages / s) | Subscribe (messages / s - batch size = 1) | Subscribe (messages / s - batch size = 100) |
+|----------------------|------------------------|-------------------------------------------|---------------------------------------------|
+| 16                   | 6,371                  | 283                                       | 2,794                                       |
+| 64                   | 9,887                  | 281                                       | 2,637                                       |
+| 256                  | 9,596                  | 271                                       | 2,766                                       |
+
+### SQL (PostgreSQL)
+
+| Message size (bytes) | Publish (messages / s) | Subscribe (messages / s - batch size = 1) | Subscribe (messages / s - batch size = 100) | 
+|----------------------|------------------------|-------------------------------------------|---------------------------------------------|
+| 16                   | 2,552                  | 122                                       | 9,460                                       |
+| 64                   | 2,831                  | 118                                       | 9,045                                       |
+| 256                  | 2,744                  | 104                                       | 7,843                                       |
+
+### SQL (PostgreSQL Queue)
+
+| Subscribe Batch Size | Message size (bytes) | Publish (messages / s) |  Subscribe (messages / s - batch size = 1) | Subscribe (messages / s - batch size = 100) | 
+|----------------------|----------------------|------------------------|--------------------------------------------|---------------------------------------------|
+| 100                  | 16                   | 2,825                  | 146                                        | 10,466                                      |
+| 100                  | 64                   | 2,842                  | 147                                        | 9,626                                       |
+| 100                  | 256                  | 2,845                  | 138                                        | 8,276                                       |
 
 | Message size (bytes) | Publish (messages / s) | Subscribe (messages / s) |
 |----------------------|------------------------|--------------------------|
-| 16                   | 5,732                  | 2,794                    |
-| 64                   | 5,961                  | 2,637                    |
-| 256                  | 5,627                  | 2,766                    |
-
-### SQL (PostgreSQL, batch size 100)
-
-| Message size (bytes) | Publish (messages / s) | Subscribe (messages / s) |
-|----------------------|------------------------|--------------------------|
-| 16                   | 2,464                  | 9,460                    |
-| 64                   | 2,487                  | 9,045                    |
-| 256                  | 2,300                  | 7,843                    |
-
-### SQL (PostgreSQL Queue, batch size 100)
-
-| Message size (bytes) | Publish (messages / s) | Subscribe (messages / s) |
-|----------------------|------------------------|--------------------------|
-| 16                   | 2,551                  | 10,466                   |
-| 64                   | 2,585                  | 9,626                    |
-| 256                  | 2,320                  | 8,276                    |
+| 16                   | 2,825                  | 0,146                    |
+| 64                   | 2,842                  | 0,147                    |
+| 256                  | 2,845                  | 0,138                    |
 
 ### Google Cloud Pub/Sub (16 subscribers)
 
