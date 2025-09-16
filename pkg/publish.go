@@ -21,7 +21,7 @@ func (ps PubSub) PublishMessages() (Results, error) {
 
 	addMsg := make(chan *message.Message)
 
-	for num := 0; num < workers; num++ {
+	for range workers {
 		go func() {
 			defer wg.Done()
 
@@ -55,7 +55,7 @@ func (ps PubSub) PublishMessages() (Results, error) {
 
 	wg.Wait()
 
-	elapsed := time.Now().Sub(start)
+	elapsed := time.Since(start)
 
 	fmt.Printf("added %d messages in %s, %f msg/s\n", ps.MessagesCount, elapsed, float64(ps.MessagesCount)/elapsed.Seconds())
 

@@ -68,7 +68,7 @@ func generateTable(pubResults, subResults []pkg.Results) string {
 	}
 
 	// Check data widths for each column including thousand separators
-	for i := 0; i < len(pubResults); i++ {
+	for i := range pubResults {
 		// Column 1: Message size
 		msgSizeWidth := len(fmt.Sprintf("%d", pubResults[i].MessageSize))
 		if msgSizeWidth > colWidths[0] {
@@ -105,7 +105,7 @@ func generateTable(pubResults, subResults []pkg.Results) string {
 	buf.WriteString("\n")
 
 	// Write data rows
-	for i := 0; i < len(pubResults); i++ {
+	for i := range pubResults {
 		buf.WriteString("|")
 
 		// Message size (left-aligned)
